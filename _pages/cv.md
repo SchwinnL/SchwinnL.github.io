@@ -11,30 +11,27 @@ redirect_from:
 
 Education
 ======
-* B.S. in GitHub, GitHub University, 2012
-* M.S. in Jekyll, GitHub University, 2014
-* Ph.D in Version Control Theory, GitHub University, 2018 (expected)
+* Ph.D in Robust Machine Learning at Friedrich-Alexander University Erlangen-Nürnberg, supervised by Prof. Björn Eskofier, 2023
+* M.Sc. in Medical Engineering at Friedrich-Alexander University Erlangen-Nürnberg, 2019
+* B.Sc. in Medical Engineering at Friedrich-Alexander University Erlangen-Nürnberg, 2017
+
+ \item {11/2022 - 10/2023} \tab{}\textbf{Computer vision expert for safe AI} at \textbf{Robert Bosch GmbH} \\
+        Working on robust deep learning-based visual perception in autonomous driving
 
 Work experience
 ======
-* Summer 2015: Research Assistant
-  * Github University
-  * Duties included: Tagging issues
-  * Supervisor: Professor Git
+* 2023-today: Postdoc
+  * Friedrich-Alexander University Erlangen-Nürnberg
+  * Data-efficient robust learning
+  * Supervisor: Prof. Björn Eskofier
 
-* Fall 2015: Research Assistant
-  * Github University
-  * Duties included: Merging pull requests
-  * Supervisor: Professor Hub
-  
-Skills
-======
-* Skill 1
-* Skill 2
-  * Sub-skill 2.1
-  * Sub-skill 2.2
-  * Sub-skill 2.3
-* Skill 3
+* 2022-today: Deep Learning Engineer
+  * Robert Bosch GmbH
+  * Working on robust machine learning for autonomous driving
+
+* 2019-2021: Researcher & PhD Candidate
+  * Conducting research on uncertainty and robustness in neural networks with a particular focus on covariate shifts and adversarial examples
+  * Supervisor: Prof. Björn Eskofier
 
 Publications
 ======
@@ -48,12 +45,6 @@ Talks
     {% include archive-single-talk-cv.html %}
   {% endfor %}</ul>
   
-Teaching
+Service
 ======
-  <ul>{% for post in site.teaching %}
-    {% include archive-single-cv.html %}
-  {% endfor %}</ul>
-  
-Service and leadership
-======
-* Currently signed in to 43 different slack teams
+* I have reviewed manuscripts for the following Conferences and Journals: ICML, AAAI, IJCAI, ECML
