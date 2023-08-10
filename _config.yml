@@ -82,8 +82,7 @@ analytics:
 author:
   name             : "Leo Schwinn"
   avatar           : "profile.png"
-  bio              : "I'm currently a Postdoc at the Friedrich-Alexander-Universität Erlangen-Nürnberg and a deep learning engineer working on safe autonomous driving at Robert Bosch."
-  location         : "Stuttgart"
+  bio              : 
   employer         :
   pubmed           : 
   googlescholar    : "https://scholar.google.de/citations?user=PXT4k9cAAAAJ&hl=de&authuser=1"
