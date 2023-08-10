@@ -1,10 +1,7 @@
 # main links links
 main:
   - title: "Publications"
-    url: /publications/
+    url: https://scholar.google.de/citations?user=PXT4k9cAAAAJ&hl=de&authuser=1
 
-  - title: "Talks"
-    url: /talks/    
-  
   - title: "CV"
     url: /cv/
