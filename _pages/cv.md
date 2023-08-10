@@ -33,12 +33,6 @@ Work experience
   * Conducting research on uncertainty and robustness in neural networks with a particular focus on covariate shifts and adversarial examples
   * Supervisor: Prof. Björn Eskofier
 
-Publications
-======
-  <ul>{% for post in site.publications %}
-    {% include archive-single-cv.html %}
-  {% endfor %}</ul>
-  
 Talks
 ======
   <ul>{% for post in site.talks %}
