@@ -8,4 +8,4 @@ redirect_from:
   - /about.html
 ---
 
-I'm a [Postdoc at the Friedrich-Alexander University Erlangen-Nürnberg (FAU)](https://www.mad.tf.fau.de/person/leo-schwinn/), interested in robust machine learning with a focus on data-efficient learning and distribution shifts. I am also employed by Robert Bosch, working on robust computer vision for autonomous driving. Previously, I did my Ph.D. at FAU under the supervision of Prof. Dr. Björn Eksofier and conducted an internship under the supervision of [Prof. Dr. Doina Precup at the Mila Quebec AI Institute](https://mila.quebec/en/person/leo-schwinn/). 
+I'm a [Postdoc at the Friedrich-Alexander University Erlangen-Nürnberg (FAU)](https://www.mad.tf.fau.de/person/leo-schwinn/), interested in robust machine learning with a focus on data-efficient learning and distribution shifts. I am also employed by Robert Bosch, working on robust computer vision for autonomous driving. Previously, I did my Ph.D. at FAU under the supervision of Prof. Dr. Björn Eskofier and conducted an internship under the supervision of [Prof. Dr. Doina Precup at the Mila Quebec AI Institute](https://mila.quebec/en/person/leo-schwinn/). 
