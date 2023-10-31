@@ -9,11 +9,15 @@ redirect_from:
 news: true
 ---
 
-I'm a [Postdoc at the Friedrich-Alexander University Erlangen-Nürnberg (FAU)](https://www.mad.tf.fau.de/person/leo-schwinn/), interested in robust machine learning with a focus on data-efficient learning and distribution shifts. I am also employed by Robert Bosch, working on robust computer vision for autonomous driving. Previously, I did my Ph.D. at FAU under the supervision of Prof. Björn Eskofier and conducted an internship under the supervision of [Prof. Doina Precup at the Mila Quebec AI Institute](https://mila.quebec/en/person/leo-schwinn/). 
+I'm a Postdoc at the Technical University of Munich and the Munich Data Science Institute, interested in robust machine learning with a focus on data-efficient learning and robustness vulnerabilities of Large Language Models (LLMs). 
+
+Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg (FAU) under the supervision of Prof. Björn Eskofier and conducted an internship under the supervision of [Prof. Doina Precup at the Mila Quebec AI Institute](https://mila.quebec/en/person/leo-schwinn/). After my PhD, I worked as a Postdoc at FAU and as a machine learning engineer at Robert Bosch on robust computer vision for autonomous driving. 
 
 ### News
 
 - November, 2023: I will start as a Postdoc at the [Technical University of Munich](https://www.tum.de/) and [Munich Data Science Institute](https://www.mdsi.tum.de/mdsi/startseite/) in the [Data Analytics and Machine Learning group](https://www.cs.cit.tum.de/daml/startseite/) supervised by Prof. Stephan Günnemann
+
+- October, 2023: We published ["Adversarial Attacks and Defenses in Large Language Models: Old and New Threats"](https://arxiv.org/abs/2310.19737) at NeurIPS 2023 I Can’t Believe It’s Not Better (ICBINB): Failure Modes in the Age of Foundation Models Workshop.
 
 - October, 2023: I'm now a member of [ELLIS - the European Laboratory for Learning and Intelligent Systems](https://ellis.eu/)
 
