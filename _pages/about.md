@@ -17,8 +17,8 @@ Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg 
 
 - November, 2023: I will start as a Postdoc at the [Technical University of Munich](https://www.tum.de/) and [Munich Data Science Institute](https://www.mdsi.tum.de/mdsi/startseite/) in the [Data Analytics and Machine Learning group](https://www.cs.cit.tum.de/daml/startseite/) supervised by Prof. Stephan Günnemann
 
-- October, 2023: We published ["Adversarial Attacks and Defenses in Large Language Models: Old and New Threats"](https://arxiv.org/abs/2310.19737) at NeurIPS 2023 I Can’t Believe It’s Not Better (ICBINB): Failure Modes in the Age of Foundation Models Workshop.
+- October, 2023: We will present ["Adversarial Attacks and Defenses in Large Language Models: Old and New Threats"](https://arxiv.org/abs/2310.19737) as a **spotlight** presentation at NeurIPS 2023 I Can’t Believe It’s Not Better (ICBINB): Failure Modes in the Age of Foundation Models Workshop.
 
 - October, 2023: I'm now a member of [ELLIS - the European Laboratory for Learning and Intelligent Systems](https://ellis.eu/)
 
-- April, 2023: I am a organizer / track chair of the [ICLR Blogpost track 2024](https://iclr-blogposts.github.io/2024/about)
+- April, 2023: I am an organizer / track chair of the [ICLR Blogpost track 2024](https://iclr-blogposts.github.io/2024/about)
