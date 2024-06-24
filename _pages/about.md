@@ -15,6 +15,8 @@ Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg 
 
 ### News
 
+- June, 2024: Open PhD position available at my research group at the chair of Prof. Stephan Günnemann! For more information, see [here](/files/E13_Geomar.pdf)
+
 - December, 2023: I am one of the review process chairs of the [2024 Conference on Lifelong Learning Agents (CoLLAs)](https://lifelong-ml.cc/Conferences/2024/dates). Looking forward to see everyone in Pisa!
 
 - November, 2023: I will start as a Postdoc at the [Technical University of Munich](https://www.tum.de/) and [Munich Data Science Institute](https://www.mdsi.tum.de/mdsi/startseite/) in the [Data Analytics and Machine Learning group](https://www.cs.cit.tum.de/daml/startseite/) supervised by Prof. Stephan Günnemann
