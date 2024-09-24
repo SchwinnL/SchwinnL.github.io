@@ -15,7 +15,7 @@ Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg 
 
 ### News
 
-- June, 2024: Open PhD position available at my research group at the chair of Prof. Stephan Günnemann! For more information, see [here](/files/E13_Geomar.pdf)
+- June, 2024: <s>Open PhD position available at my research group at the chair of Prof. Stephan Günnemann! For more information, see [here](/files/E13_Geomar.pdf)</s> (Position is filled!)
 
 - December, 2023: I am one of the review process chairs of the [2024 Conference on Lifelong Learning Agents (CoLLAs)](https://lifelong-ml.cc/Conferences/2024/dates). Looking forward to see everyone in Pisa!
 
