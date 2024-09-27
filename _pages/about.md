@@ -15,7 +15,9 @@ Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg 
 
 ### News
 
-- June, 2024: <s>Open PhD position available at my research group at the chair of Prof. Stephan Günnemann! For more information, see [here](/files/E13_Geomar.pdf)</s> (Position is filled!)
+- September, 2024: Happy to have three papers accepted at NeurIPS!, we [explore new threat models in LLMs](https://arxiv.org/abs/2402.09063), propose the first [efficient adversarial training algorithm for LLMs](https://arxiv.org/abs/2405.15589), and [explore scaling properties of Lipschitz-1 neural networks](https://arxiv.org/abs/2305.10388)
+
+- June, 2024: Position is filled! <s>Open PhD position available at my research group at the chair of Prof. Stephan Günnemann! For more information, see [here](/files/E13_Geomar.pdf)</s>
 
 - December, 2023: I am one of the review process chairs of the [2024 Conference on Lifelong Learning Agents (CoLLAs)](https://lifelong-ml.cc/Conferences/2024/dates). Looking forward to see everyone in Pisa!
 
