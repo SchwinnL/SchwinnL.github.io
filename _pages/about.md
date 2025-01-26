@@ -11,7 +11,7 @@ news: true
 
 I'm a Lecturer at the Technical University of Munich, interested in robust machine learning with a focus on data-efficient learning and robustness vulnerabilities of Large Language Models (LLMs). 
 
-Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg (FAU) under the supervision of Prof. Björn Eskofier, receiving the (ATE dissertation price)[https://www.tf.fau.de/2024/11/allgemein/verleihung-der-promotionspreise-2024/]. During my PhD I conducted an internship under the supervision of [Prof. Doina Precup at the Mila Quebec AI Institute](https://mila.quebec/en/person/leo-schwinn/). After my PhD, I worked as a Postdoc at FAU and as a machine learning engineer at Robert Bosch on robust computer vision for autonomous driving. 
+Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg (FAU) under the supervision of Prof. Björn Eskofier, receiving the [ATE dissertation price](https://www.tf.fau.de/2024/11/allgemein/verleihung-der-promotionspreise-2024/). During my PhD I conducted an internship under the supervision of [Prof. Doina Precup at the Mila Quebec AI Institute](https://mila.quebec/en/person/leo-schwinn/). After my PhD, I worked as a Postdoc at FAU and as a machine learning engineer at Robert Bosch on robust computer vision for autonomous driving. 
 
 ### News
 
