@@ -15,7 +15,7 @@ Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg 
 
 ### News
 
-- February, 2025: We are presenting one paper at **CVPR 2025** :-), In Joint Out-of-Distribution Filtering and Data Discovery Active Learning, we introduce Joda, the first active learning approach to handle both out-of-distribution data and new category discovery at the same time.
+- February, 2025: We are presenting one paper at **CVPR 2025** :-), In [Joint Out-of-Distribution Filtering and Data Discovery Active Learning](https://arxiv.org/abs/2503.02491), we introduce Joda, the first active learning approach to handle both out-of-distribution data and new category discovery at the same time.
 
 - January, 2025: We are presenting two papers at **ICLR 2025**! A [probabilistic perspective into unlearning in LLMs](https://arxiv.org/pdf/2410.03523), where we reveal that current evaluations are unreliabe. Moreover, we introduce a novel probabilistic time series forcasting algorithm [combining Gaussian Process priors and flow matching](https://arxiv.org/pdf/2410.03024)
 
