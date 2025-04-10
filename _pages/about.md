@@ -17,6 +17,8 @@ Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg 
 
 - February, 2025: We are presenting one paper at **CVPR 2025** :-), In [Joint Out-of-Distribution Filtering and Data Discovery Active Learning](https://arxiv.org/abs/2503.02491), we introduce Joda, the first active learning approach to handle both out-of-distribution data and new category discovery at the same time.
 
+- February, 2025: A [probabilistic perspective into unlearning in LLMs](https://arxiv.org/pdf/2410.03523) was awarded an **Oral presentation at ICLR 2025** 🥳
+
 - January, 2025: We are presenting two papers at **ICLR 2025**! A [probabilistic perspective into unlearning in LLMs](https://arxiv.org/pdf/2410.03523), where we reveal that current evaluations are unreliabe. Moreover, we introduce a novel probabilistic time series forcasting algorithm [combining Gaussian Process priors and flow matching](https://arxiv.org/pdf/2410.03024)
 
 - September, 2024: Happy to have three papers accepted at **NeurIPS 2024**!, we [explore new threat models in LLMs](https://arxiv.org/abs/2402.09063), propose the first [efficient adversarial training algorithm for LLMs](https://arxiv.org/abs/2405.15589), and [explore scaling properties of Lipschitz-1 neural networks](https://arxiv.org/abs/2305.10388)
