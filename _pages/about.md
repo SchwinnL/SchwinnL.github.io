@@ -9,11 +9,14 @@ redirect_from:
 news: true
 ---
 
-I'm a Lecturer at the Technical University of Munich, interested in robust machine learning with a focus on data-efficient learning and robustness vulnerabilities of Large Language Models (LLMs). I am currently the main organizer of the ICLR BlogPost Track and am always happy to answer questions about the track. 
+I'm a Lecturer at the Technical University of Munich, supervising and co-supervising 4 PhD students. I am interested in robust machine learning with a focus on data-efficient learning and robustness vulnerabilities of Large Language Models (LLMs). I am currently the main organizer of the ICLR BlogPost Track and am always happy to answer questions about the track. 
 
 Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg (FAU) under the supervision of Prof. Björn Eskofier, receiving the [ATE dissertation price](https://www.tf.fau.de/2024/11/allgemein/verleihung-der-promotionspreise-2024/). During my PhD I conducted an internship under the supervision of [Prof. Doina Precup at the Mila Quebec AI Institute](https://mila.quebec/en/person/leo-schwinn/). After my PhD, I worked as a Postdoc at FAU and as a machine learning engineer at Robert Bosch on robust computer vision for autonomous driving. 
 
 ### News
+
+- January, 2026: **2** AI safety papers accepted at **ICLR 2026**, Converting a bug into a feature by using model collapse as a reliable machine unlearning technique for LLMs in [Model Collapse Is Not a Bug but a Feature in Machine Unlearning for LLMs
+](https://arxiv.org/abs/2507.04219) and showcasing the importance of probabilistic evaluations and sampling in adversarial attacks in LLMs [Sampling-aware Adversarial Attacks Against Large Language Models](https://arxiv.org/abs/2507.04446)
 
 - September, 2025: **2** papers accepted at **NeurIPS 2025**, We capture complex inter-table dependencies in graph generation tasks [Joint Relational Database Generation via Graph-Conditional Diffusion Models
 ](https://arxiv.org/abs/2505.16527), and we make Vision Language Models work for high-detail VQA tasks in [FOCUS: Internal MLLM Representations for Efficient Fine-Grained Visual Question Answering
