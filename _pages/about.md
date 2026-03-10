@@ -15,8 +15,9 @@ Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg 
 
 ### News
 
-- January, 2026: **2** AI safety papers accepted at **ICLR 2026**, Converting a bug into a feature by using model collapse as a reliable machine unlearning technique for LLMs in [Model Collapse Is Not a Bug but a Feature in Machine Unlearning for LLMs
-](https://arxiv.org/abs/2507.04219) and showcasing the importance of probabilistic evaluations and sampling in adversarial attacks in LLMs [Sampling-aware Adversarial Attacks Against Large Language Models](https://arxiv.org/abs/2507.04446)
+- January, 2026: **3** AI safety papers accepted at **ICLR 2026**, Converting a bug into a feature by using model collapse as a reliable machine unlearning technique for LLMs in [Model Collapse Is Not a Bug but a Feature in Machine Unlearning for LLMs
+](https://arxiv.org/abs/2507.04219), showcasing the importance of probabilistic evaluations and sampling in adversarial attacks in LLMs [Sampling-aware Adversarial Attacks Against Large Language Models](https://arxiv.org/abs/2507.04446), and one of our TMLR papers on how to improve robustness of Graph Transformers: [Adversarial Robustness of Graph Transformers](https://openreview.net/forum?id=leFBpvYaPx) was selected for the journal to conference track. 
+
 
 - September, 2025: **2** papers accepted at **NeurIPS 2025**, We capture complex inter-table dependencies in graph generation tasks [Joint Relational Database Generation via Graph-Conditional Diffusion Models
 ](https://arxiv.org/abs/2505.16527), and we make Vision Language Models work for high-detail VQA tasks in [FOCUS: Internal MLLM Representations for Efficient Fine-Grained Visual Question Answering
