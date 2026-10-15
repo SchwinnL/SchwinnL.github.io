@@ -15,6 +15,8 @@ Previously, I did my Ph.D. at Friedrich-Alexander University Erlangen-Nürnberg 
 
 ### News
 
+- September, 2026: **2** papers accepted at **NeurIPS 2026**! We show that diffusion LLMs can be used to generate strong adversarial prompts that transfer to any LLM in [Diffusion LLMs are Natural Adversaries for any LLM](https://arxiv.org/abs/2511.00203), and we propose a single model that efficiently predicts hundreds of virtual sensors at once in [A Scalable Multi-Task Model for Virtual Sensors](https://arxiv.org/abs/2601.20634).
+
 - April, 2026: **3** papers accepted at **ICML 2026**! Two AI safety works highlighting weaknesses in current LLM robustness evaluations, [LLM-Safety Evaluations Lack Robustness](https://arxiv.org/abs/2503.02574) and [A Coin Flip for Safety: LLM Judges Fail to Reliably Measure Adversarial Robustness](https://arxiv.org/abs/2603.06594), and we introduce a tokenization scheme for efficient time-series forecasting in [Byte Pair Encoding for Efficient Time Series Forecasting](https://arxiv.org/abs/2505.14411).
 
 - January, 2026: **4** papers accepted at **ICLR 2026**, Converting a bug into a feature by using model collapse as a reliable machine unlearning technique for LLMs in [Model Collapse Is Not a Bug but a Feature in Machine Unlearning for LLMs
