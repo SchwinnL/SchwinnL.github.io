@@ -70,6 +70,10 @@
   .error { color: var(--danger); font-size: 14px; margin: 0; }
   .muted { color: var(--muted); }
   .empty { color: var(--muted); padding: 12px 0; }
+  .wait { display: flex; align-items: center; gap: 10px; color: var(--muted); padding: 12px 0; }
+  .spinner { flex: 0 0 18px; width: 18px; height: 18px; border: 2px solid var(--line); border-top-color: var(--accent);
+             border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
   .types { display: grid; gap: 12px; }
   .type { display: block; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; color: inherit; text-decoration: none; }
   .type:hover { border-color: var(--accent); }
@@ -153,6 +157,25 @@ function header(title, desc) {
   ];
 }
 
+/** Spinner with a hint that Google can be slow to answer. */
+function waiting(text) {
+  return h('div', { class: 'wait', role: 'status' }, h('span', { class: 'spinner' }),
+    h('span', {}, text, ' ', h('span', { class: 'opt', text: 'This can take up to 30 seconds.' })));
+}
+
+// Slot requests per duration, shared so prefetched results are reused.
+const slotRequests = {};
+function fetchSlots(typeId, d) {
+  if (!slotRequests[d]) {
+    slotRequests[d] = call('getSlots', typeId, d);
+    slotRequests[d].catch(() => { delete slotRequests[d]; });
+  }
+  return slotRequests[d];
+}
+function resetSlots() {
+  Object.keys(slotRequests).forEach(k => { delete slotRequests[k]; });
+}
+
 function durationText(list) {
   return list.length > 1 ? `${list[0]}–${list[list.length - 1]} min` : `${list[0]} min`;
 }
@@ -208,8 +231,10 @@ function loadSlots() {
   S.loading = true;
   S.step = 'pick';
   draw();
-  call('getSlots', T.id, S.duration)
+  const d = S.duration;
+  fetchSlots(T.id, d)
     .then(res => {
+      if (d !== S.duration) return; // the visitor switched duration meanwhile
       S.loading = false;
       S.paused = res.paused;
       S.slots = res.slots || [];
@@ -218,8 +243,10 @@ function loadSlots() {
       if (!S.byDay[S.day]) S.day = S.slots.length ? dayKey(new Date(S.slots[0])) : null;
       S.month = S.day ? monthStart(new Date(S.byDay[S.day][0])) : null;
       draw();
+      T.durations.forEach(x => fetchSlots(T.id, x)); // prefetch the other durations
     })
     .catch(err => {
+      if (d !== S.duration) return;
       S.loading = false;
       S.notice = cleanError(err);
       draw();
@@ -235,7 +262,7 @@ function draw() {
 
 function pickView() {
   const notice = S.notice ? h('p', { class: 'error', text: S.notice }) : null;
-  if (S.loading) return [h('p', { class: 'empty', text: 'Loading available times…' })];
+  if (S.loading) return [waiting('Loading available times…')];
   if (S.paused) return [h('p', { class: 'empty' },
     'Booking is paused right now. Please email ', h('a', { href: `mailto:${BOOT.contact}`, text: BOOT.contact }), '.')];
   if (!S.slots.length) return [notice, h('p', { class: 'empty' },
@@ -312,6 +339,7 @@ function formView() {
   }
 
   const submit = h('button', { class: 'primary', type: 'submit', text: 'Confirm booking' });
+  const pending = h('div', { hidden: true }, waiting('Booking your meeting and sending the invites…'));
   const form = h('form', { novalidate: true },
     h('label', {}, 'Your name', h('input', { name: 'name', required: true, autocomplete: 'name', maxlength: 100 })),
     h('label', {}, 'Your email', h('input', { name: 'email', type: 'email', required: true, autocomplete: 'email' })),
@@ -319,7 +347,8 @@ function formView() {
       h('textarea', { name: 'topic', maxlength: 2000 })),
     T.maxGuests > 0 ? guests : null,
     error,
-    submit);
+    submit,
+    pending);
 
   form.addEventListener('submit', e => {
     e.preventDefault();
@@ -331,19 +360,24 @@ function formView() {
       topic: String(fd.get('topic') || ''),
       guests: fd.getAll('guest').map(String).map(s => s.trim()).filter(Boolean),
     };
-    const fail = msg => { error.textContent = msg; error.hidden = false; submit.disabled = false; submit.textContent = 'Confirm booking'; };
+    const fail = msg => {
+      error.textContent = msg; error.hidden = false; pending.hidden = true;
+      submit.disabled = false; submit.textContent = 'Confirm booking';
+    };
     if (!req.name) return fail('Please enter your name.');
     if (!/^\S+@\S+\.\S+$/.test(req.email)) return fail('Please enter a valid email address.');
 
     submit.disabled = true;
     submit.textContent = 'Booking…';
     error.hidden = true;
+    pending.hidden = false;
     call('book', req)
-      .then(res => { S.result = Object.assign({ email: req.email, guests: req.guests.length }, res); S.step = 'done'; draw(); })
+      .then(res => { resetSlots(); S.result = Object.assign({ email: req.email, guests: req.guests.length }, res); S.step = 'done'; draw(); })
       .catch(err => {
         const msg = cleanError(err);
         if (msg.includes('SLOT_TAKEN')) {
           S.notice = 'Sorry, that time was just taken. Please pick another one.';
+          resetSlots();
           loadSlots();
         } else {
           fail(msg);
@@ -383,18 +417,23 @@ function renderCancel() {
 
   const error = h('p', { class: 'error', hidden: true });
   const btn = h('button', { class: 'primary danger', type: 'button', text: 'Cancel meeting' });
+  const pending = h('div', { hidden: true }, waiting('Cancelling and notifying everyone…'));
   btn.addEventListener('click', () => {
     btn.disabled = true;
     btn.textContent = 'Cancelling…';
+    pending.hidden = false;
     call('cancelBooking', c.id, c.k)
       .then(() => put(app, ...header('Meeting cancelled'),
         h('p', { class: 'muted', text: 'Everyone who was invited has been notified.' })))
-      .catch(err => { error.textContent = cleanError(err); error.hidden = false; btn.disabled = false; btn.textContent = 'Cancel meeting'; });
+      .catch(err => {
+        error.textContent = cleanError(err); error.hidden = false; pending.hidden = true;
+        btn.disabled = false; btn.textContent = 'Cancel meeting';
+      });
   });
   put(app, ...header('Cancel meeting'),
     h('p', { style: 'margin:0 0 8px', text: c.summary }),
     slotSummary(c.start, c.end),
-    h('div', { style: 'display:grid;gap:12px' }, btn, error));
+    h('div', { style: 'display:grid;gap:12px' }, btn, pending, error));
 }
 
 function start(boot) {
@@ -407,10 +446,12 @@ function start(boot) {
 if (BOOT) {
   start(BOOT);
 } else {
-  app.textContent = 'Loading…';
+  put(app, waiting('Loading…'));
   const q = new URLSearchParams(location.search);
   const params = {};
   ['t', 'cancel', 'k'].forEach(key => { if (q.get(key)) params[key] = q.get(key); });
+  // Start loading the 30-minute slots right away instead of waiting for the page settings.
+  if (params.t && !params.cancel) fetchSlots(params.t, 30);
   call('config', params)
     .then(start)
     .catch(() => { app.textContent = 'The booking page could not be loaded. Please try again later.'; });
