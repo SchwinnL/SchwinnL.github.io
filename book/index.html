@@ -81,6 +81,12 @@
   .ok-icon { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 12px;
              border-radius: 50%; background: var(--ok); color: #fff; font-size: 22px; }
   a { color: var(--accent); }
+  .export { margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .export-panel { margin-top: 14px; }
+  canvas.week { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 10px; }
+  .export-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .secondary { padding: 9px 14px; border: 1px solid var(--accent); border-radius: 8px; background: transparent;
+               color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; }
   @media (max-width: 680px) {
     .wrap { margin: 16px auto; }
     .card { padding: 20px; }
@@ -132,6 +138,7 @@ function call(name, ...args) {
   const request = {
     config: () => fetch(`${API_URL}?${new URLSearchParams(Object.assign({ api: 'config' }, args[0]))}`),
     getSlots: () => fetch(`${API_URL}?${new URLSearchParams({ api: 'slots', t: args[0], d: args[1] })}`),
+    getBusy: () => fetch(`${API_URL}?api=busy`),
     book: () => post({ action: 'book', req: args[0] }),
     cancelBooking: () => post({ action: 'cancel', id: args[0], k: args[1] }),
   }[name];
@@ -139,7 +146,7 @@ function call(name, ...args) {
     throw new Error('The booking service did not respond. Please reload the page.');
   }));
   // Google occasionally answers with an HTML error page; retry reads once (never bookings).
-  const isRead = name === 'config' || name === 'getSlots';
+  const isRead = name === 'config' || name === 'getSlots' || name === 'getBusy';
   return once()
     .catch(err => (isRead ? new Promise(r => setTimeout(r, 1000)).then(once) : Promise.reject(err)))
     .then(res => { if (!res.ok) throw new Error(res.error); return res.data; });
@@ -191,7 +198,7 @@ function renderIndex() {
           h('b', { text: t.title }),
           h('div', { class: 'muted', text: [durationText(t.durations), t.description].filter(Boolean).join(' · ') }))))
     : h('p', { class: 'empty', text: 'Please use the booking link you were sent.' });
-  put(app, ...header('Book a meeting'), list);
+  put(app, ...header('Book a meeting'), list, exportSection());
 }
 
 function renderNotFound() {
@@ -217,7 +224,7 @@ function renderBook() {
         h('div', { class: 'chips' }, T.durations.map(d =>
           h('button', { class: 'chip', type: 'button', 'data-d': d, onclick: () => setDuration(d) }, `${d} min`))))
     : h('p', { class: 'muted', text: `${T.durations[0]} min` });
-  put(app, ...header(T.title, T.description), durationBox, body);
+  put(app, ...header(T.title, T.description), durationBox, body, exportSection());
   setDuration(S.duration);
 }
 
@@ -404,6 +411,171 @@ function doneView() {
     r.meetLink ? h('p', {}, 'Meet link: ', h('a', { href: r.meetLink, target: '_blank', text: r.meetLink })) : null,
     h('p', { class: 'note' }, 'Need to cancel? Use the link in the invite or ', h('a', { href: r.cancelUrl, text: 'cancel here' }), '.'),
   ];
+}
+
+// ---------------------------------------------------------------------------
+// Availability export: week image and calendar file with busy times only
+// ---------------------------------------------------------------------------
+
+const WEEK_HOURS = [8, 18];
+const fmtDayShort = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+const fmtDate = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+function exportSection() {
+  const panel = h('div', { class: 'export-panel', hidden: true });
+  let state = 'idle';
+  const toggle = h('button', { class: 'link-btn', type: 'button', text: 'Export my availability (week image or calendar file)' });
+  toggle.addEventListener('click', () => {
+    panel.hidden = !panel.hidden;
+    if (panel.hidden || state !== 'idle') return;
+    state = 'loading';
+    put(panel, waiting('Loading availability…'));
+    call('getBusy')
+      .then(data => {
+        state = 'done';
+        if (data.paused) return put(panel, h('p', { class: 'empty', text: 'Availability is not available right now.' }));
+        renderExport(panel, data);
+      })
+      .catch(err => { state = 'idle'; put(panel, h('p', { class: 'error', text: cleanError(err) })); });
+  });
+  return h('div', { class: 'export' }, toggle, panel);
+}
+
+function mondayOf(ms) {
+  const d = new Date(ms);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7));
+}
+
+function renderExport(panel, data) {
+  const weeks = [];
+  for (let w = mondayOf(data.from); w.getTime() < data.to; w = new Date(w.getFullYear(), w.getMonth(), w.getDate() + 7)) weeks.push(w);
+  let i = 0;
+  const canvas = h('canvas', { class: 'week', role: 'img', 'aria-label': 'Week view of busy times' });
+  const label = h('b');
+  const prev = h('button', { class: 'nav', type: 'button', 'aria-label': 'Previous week', text: '‹' });
+  const next = h('button', { class: 'nav', type: 'button', 'aria-label': 'Next week', text: '›' });
+  const show = () => {
+    drawWeek(canvas, weeks[i], data);
+    label.textContent = `Week of ${fmtDate.format(weeks[i])}`;
+    prev.disabled = i === 0;
+    next.disabled = i === weeks.length - 1;
+  };
+  prev.addEventListener('click', () => { i--; show(); });
+  next.addEventListener('click', () => { i++; show(); });
+  put(panel,
+    h('div', { class: 'month-head' }, prev, label, next),
+    canvas,
+    h('div', { class: 'export-actions' },
+      h('button', { class: 'secondary', type: 'button', text: 'Download week image', onclick: () => downloadPng(canvas, weeks[i]) }),
+      h('button', { class: 'secondary', type: 'button', text: 'Download calendar file (.ics, next month)', onclick: () => downloadIcs(data) })),
+    h('p', { class: 'note', text: `Shows only when ${BOOT.owner} is busy, without any meeting details. Times are in ${TZ}.` }));
+  show();
+}
+
+/** Draws Mon-Fri, WEEK_HOURS, with busy blocks. Light colours so the exported image looks the same everywhere. */
+function drawWeek(canvas, monday, data) {
+  const W = 760, H = 480, left = 54, top = 84, right = 14, bottom = 40, scale = 2;
+  const font = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+  canvas.width = W * scale;
+  canvas.height = H * scale;
+  const c = canvas.getContext('2d');
+  c.setTransform(scale, 0, 0, scale, 0, 0);
+  c.fillStyle = '#ffffff';
+  c.fillRect(0, 0, W, H);
+
+  c.fillStyle = '#1c2230';
+  c.font = `600 18px ${font}`;
+  c.fillText(`${BOOT.owner} · availability`, left, 30);
+  c.fillStyle = '#5d6878';
+  c.font = `13px ${font}`;
+  c.fillText(`Week of ${fmtDate.format(monday)} · times in ${TZ}`, left, 50);
+
+  const [h0, h1] = WEEK_HOURS;
+  const colW = (W - left - right) / 5, rowH = (H - top - bottom) / (h1 - h0);
+  const y = (dayStart, t) => top + (t - dayStart) / 3600000 * rowH;
+
+  for (let d = 0; d < 5; d++) {
+    const date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + d);
+    const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), h0).getTime();
+    const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), h1).getTime();
+    const x = left + d * colW;
+
+    c.fillStyle = '#1c2230';
+    c.font = `600 13px ${font}`;
+    c.textAlign = 'center';
+    c.fillText(fmtDayShort.format(date), x + colW / 2, top - 12);
+    c.textAlign = 'left';
+
+    // Past or beyond the known range: grey.
+    [[dayStart, Math.min(dayEnd, data.from)], [Math.max(dayStart, data.to), dayEnd]].forEach(([a, b]) => {
+      if (b <= a) return;
+      c.fillStyle = '#eef0f3';
+      c.fillRect(x + 2, y(dayStart, a), colW - 4, y(dayStart, b) - y(dayStart, a));
+    });
+
+    data.busy.forEach(([a, b]) => {
+      const s = Math.max(a, dayStart), e = Math.min(b, dayEnd);
+      if (e <= s) return;
+      const top1 = y(dayStart, s), hgt = y(dayStart, e) - top1;
+      c.fillStyle = '#c9d6ee';
+      c.fillRect(x + 3, top1 + 1, colW - 6, Math.max(hgt - 2, 2));
+      if (hgt >= 18) {
+        c.fillStyle = '#2b3d63';
+        c.font = `12px ${font}`;
+        c.fillText('Busy', x + 9, top1 + 14);
+      }
+    });
+  }
+
+  c.strokeStyle = '#e2e6eb';
+  c.fillStyle = '#5d6878';
+  c.font = `11px ${font}`;
+  for (let hr = h0; hr <= h1; hr++) {
+    const yy = top + (hr - h0) * rowH;
+    c.beginPath(); c.moveTo(left, yy + 0.5); c.lineTo(W - right, yy + 0.5); c.stroke();
+    c.fillText(`${String(hr).padStart(2, '0')}:00`, 12, yy + 4);
+  }
+  for (let d = 0; d <= 5; d++) {
+    const xx = left + d * colW;
+    c.beginPath(); c.moveTo(xx + 0.5, top); c.lineTo(xx + 0.5, H - bottom); c.stroke();
+  }
+
+  const legend = [['#c9d6ee', 'Busy'], ['#ffffff', 'Free'], ['#eef0f3', 'Past']];
+  let lx = left;
+  legend.forEach(([color, text]) => {
+    c.fillStyle = color; c.fillRect(lx, H - 24, 14, 14);
+    c.strokeStyle = '#c3c9d1'; c.strokeRect(lx + 0.5, H - 23.5, 13, 13);
+    c.fillStyle = '#5d6878'; c.font = `12px ${font}`; c.fillText(text, lx + 20, H - 13);
+    lx += 80;
+  });
+}
+
+function saveFile(blob, name) {
+  const a = h('a', { href: URL.createObjectURL(blob), download: name });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+function fileSlug() {
+  return String(BOOT.owner || 'availability').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function downloadPng(canvas, monday) {
+  canvas.toBlob(blob => saveFile(blob, `${fileSlug()}-availability-${dayKey(monday)}.png`), 'image/png');
+}
+
+function downloadIcs(data) {
+  const icsDate = ms => new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const esc = v => String(v).replace(/[\\;,]/g, m => '\\' + m);
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Booking page//Availability//EN', 'CALSCALE:GREGORIAN',
+                 'METHOD:PUBLISH', `X-WR-CALNAME:${esc(BOOT.owner)} (busy)`];
+  const stamp = icsDate(Date.now());
+  data.busy.forEach(([a, b]) => lines.push('BEGIN:VEVENT', `UID:busy-${a}-${b}@booking-page`, `DTSTAMP:${stamp}`,
+    `DTSTART:${icsDate(a)}`, `DTEND:${icsDate(b)}`, `SUMMARY:${esc(BOOT.owner)}: busy`, 'TRANSP:OPAQUE', 'END:VEVENT'));
+  lines.push('END:VCALENDAR');
+  saveFile(new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/calendar' }), `${fileSlug()}-availability.ics`);
 }
 
 // ---------------------------------------------------------------------------
