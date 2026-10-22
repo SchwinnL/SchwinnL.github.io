@@ -131,8 +131,13 @@ function call(name, ...args) {
     book: () => post({ action: 'book', req: args[0] }),
     cancelBooking: () => post({ action: 'cancel', id: args[0], k: args[1] }),
   }[name];
-  return request()
-    .then(r => r.json())
+  const once = () => request().then(r => r.json().catch(() => {
+    throw new Error('The booking service did not respond. Please reload the page.');
+  }));
+  // Google occasionally answers with an HTML error page; retry reads once (never bookings).
+  const isRead = name === 'config' || name === 'getSlots';
+  return once()
+    .catch(err => (isRead ? new Promise(r => setTimeout(r, 1000)).then(once) : Promise.reject(err)))
     .then(res => { if (!res.ok) throw new Error(res.error); return res.data; });
 }
 
