@@ -206,10 +206,11 @@ function header(title, desc) {
   ];
 }
 
-/** Spinner with a hint that Google can be slow to answer. */
+/** Spinner. After 2 seconds it adds a hint that Google can be slow to answer. */
 function waiting(text) {
-  return h('div', { class: 'wait', role: 'status' }, h('span', { class: 'spinner' }),
-    h('span', {}, text, ' ', h('span', { class: 'opt', text: 'This can take up to 30 seconds.' })));
+  const hint = h('span', { class: 'opt', hidden: true, text: ' This can take up to 30 seconds.' });
+  setTimeout(() => { hint.hidden = false; }, 2000);
+  return h('div', { class: 'wait', role: 'status' }, h('span', { class: 'spinner' }), h('span', {}, text, hint));
 }
 
 // Slot requests per duration, shared so prefetched results are reused.
