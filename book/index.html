@@ -100,6 +100,8 @@
 <script>
 // Set when the page is hosted on your own website; empty when Apps Script serves it.
 const API_URL = 'https://script.google.com/macros/s/AKfycbxYXrM0m8EumOhEuc_oDaOBYL5jQscQT_absQVgBeotMOqvZN2QDcL9jgjum1XkAM048Q/exec';
+// Optional: precomputed availability on GitHub. It loads much faster than Apps Script, so the page reads it first.
+const SNAPSHOT_URL = 'https://raw.githubusercontent.com/SchwinnL/booking-data/main/availability.json';
 let BOOT = null;
 const app = document.getElementById('app');
 const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -152,6 +154,46 @@ function call(name, ...args) {
     .then(res => { if (!res.ok) throw new Error(res.error); return res.data; });
 }
 
+// The snapshot is ignored when older than 30 minutes, and after a booking attempt.
+let snapshotOn = !!SNAPSHOT_URL;
+const snapshotReady = snapshotOn ? loadSnapshot() : Promise.resolve(null);
+
+function loadSnapshot() {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 3000);
+  return fetch(SNAPSHOT_URL, { signal: ctrl.signal, cache: 'no-cache' })
+    .then(r => (r.ok ? r.json() : null))
+    .then(s => (s && s.v === 1 && Date.now() - s.generated < 30 * 60000 ? s : null))
+    .catch(() => null)
+    .finally(() => clearTimeout(timer));
+}
+
+/** Answers a read from the snapshot, or null if it has no usable answer. */
+function fromSnapshot(name, args) {
+  if (!snapshotOn) return Promise.resolve(null);
+  return snapshotReady.then(s => {
+    if (!s || !snapshotOn) return null;
+    const now = Date.now();
+    const id = v => String(v || '').trim().toLowerCase();
+    if (name === 'config') return args[0].cancel ? null : s.config[id(args[0].t)] || null;
+    if (name === 'getSlots') {
+      const r = s.slots[`${id(args[0])}:${args[1]}`];
+      return r ? { paused: r.paused, slots: r.slots.filter(ms => ms > now) } : null;
+    }
+    if (name === 'getBusy' && s.busy) {
+      const b = s.busy;
+      return Object.assign({}, b, { from: Math.max(b.from, now),
+        busy: b.busy.filter(x => x[1] > now).map(x => [Math.max(x[0], now), x[1]]) });
+    }
+    return null;
+  });
+}
+
+/** Reads from the snapshot if possible, otherwise from the backend. */
+function read(name, ...args) {
+  return fromSnapshot(name, args).then(hit => hit || call(name, ...args));
+}
+
 function cleanError(err) {
   return String((err && err.message) || err).replace(/^(Exception|Error):\s*/, '');
 }
@@ -174,12 +216,23 @@ function waiting(text) {
 const slotRequests = {};
 function fetchSlots(typeId, d) {
   if (!slotRequests[d]) {
-    slotRequests[d] = call('getSlots', typeId, d);
-    slotRequests[d].catch(() => { delete slotRequests[d]; });
+    const p = fromSnapshot('getSlots', [typeId, d]).then(hit => {
+      if (!hit) return call('getSlots', typeId, d);
+      // Show the snapshot now; the live answer replaces it if anything changed since.
+      call('getSlots', typeId, d).then(live => {
+        if (slotRequests[d] !== p) return;
+        slotRequests[d] = Promise.resolve(live);
+        if (d === S.duration && S.step === 'pick' && !S.loading && !sameSlots(live)) applySlots(live);
+      }, () => {});
+      return hit;
+    });
+    slotRequests[d] = p;
+    p.catch(() => { if (slotRequests[d] === p) delete slotRequests[d]; });
   }
   return slotRequests[d];
 }
 function resetSlots() {
+  snapshotOn = false; // after a booking attempt only live data is reliable
   Object.keys(slotRequests).forEach(k => { delete slotRequests[k]; });
 }
 
@@ -242,14 +295,7 @@ function loadSlots() {
   fetchSlots(T.id, d)
     .then(res => {
       if (d !== S.duration) return; // the visitor switched duration meanwhile
-      S.loading = false;
-      S.paused = res.paused;
-      S.slots = res.slots || [];
-      S.byDay = {};
-      S.slots.forEach(ms => (S.byDay[dayKey(new Date(ms))] ||= []).push(ms));
-      if (!S.byDay[S.day]) S.day = S.slots.length ? dayKey(new Date(S.slots[0])) : null;
-      S.month = S.day ? monthStart(new Date(S.byDay[S.day][0])) : null;
-      draw();
+      applySlots(res);
       T.durations.forEach(x => fetchSlots(T.id, x)); // prefetch the other durations
     })
     .catch(err => {
@@ -258,6 +304,21 @@ function loadSlots() {
       S.notice = cleanError(err);
       draw();
     });
+}
+
+function applySlots(res) {
+  S.loading = false;
+  S.paused = !!res.paused;
+  S.slots = res.slots || [];
+  S.byDay = {};
+  S.slots.forEach(ms => (S.byDay[dayKey(new Date(ms))] ||= []).push(ms));
+  if (!S.byDay[S.day]) S.day = S.slots.length ? dayKey(new Date(S.slots[0])) : null;
+  S.month = S.day ? monthStart(new Date(S.byDay[S.day][0])) : null;
+  draw();
+}
+
+function sameSlots(res) {
+  return !!res.paused === S.paused && JSON.stringify(res.slots || []) === JSON.stringify(S.slots);
 }
 
 function draw() {
@@ -395,7 +456,7 @@ function formView() {
   return [
     slotSummary(S.slot, end),
     h('button', { class: 'link-btn', type: 'button', text: '← Choose another time', style: 'margin-bottom:18px',
-                  onclick: () => { S.step = 'pick'; draw(); } }),
+                  onclick: () => loadSlots() }),
     form,
   ];
 }
@@ -430,7 +491,7 @@ function exportSection() {
     if (panel.hidden || state !== 'idle') return;
     state = 'loading';
     put(panel, waiting('Loading availability…'));
-    call('getBusy')
+    read('getBusy')
       .then(data => {
         state = 'done';
         if (data.paused) return put(panel, h('p', { class: 'empty', text: 'Availability is not available right now.' }));
@@ -624,7 +685,7 @@ if (BOOT) {
   ['t', 'cancel', 'k'].forEach(key => { if (q.get(key)) params[key] = q.get(key); });
   // Start loading the 30-minute slots right away instead of waiting for the page settings.
   if (params.t && !params.cancel) fetchSlots(params.t, 30);
-  call('config', params)
+  read('config', params)
     .then(start)
     .catch(() => { app.textContent = 'The booking page could not be loaded. Please try again later.'; });
 }
