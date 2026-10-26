@@ -55,6 +55,7 @@
   form { display: grid; gap: 14px; max-width: 520px; }
   label, .field { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
   .opt { font-weight: 400; color: var(--muted); }
+  .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
   input, textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px;
                     background: var(--card); color: var(--text); font: inherit; font-weight: 400; }
   textarea { min-height: 80px; resize: vertical; }
@@ -248,7 +249,7 @@ function durationText(list) {
 function renderIndex() {
   const list = BOOT.types.length
     ? h('div', { class: 'types' }, BOOT.types.map(t =>
-        h('a', { class: 'type', href: `${BOOT.baseUrl}?t=${encodeURIComponent(t.id)}` },
+        h('a', { class: 'type', href: `${BOOT.baseUrl || location.pathname}?t=${encodeURIComponent(t.id)}` },
           h('b', { text: t.title }),
           h('div', { class: 'muted', text: [durationText(t.durations), t.description].filter(Boolean).join(' · ') }))))
     : h('p', { class: 'empty', text: 'Please use the booking link you were sent.' });
@@ -332,10 +333,8 @@ function draw() {
 function pickView() {
   const notice = S.notice ? h('p', { class: 'error', text: S.notice }) : null;
   if (S.loading) return [waiting('Loading available times…')];
-  if (S.paused) return [h('p', { class: 'empty' },
-    'Booking is paused right now. Please email ', h('a', { href: `mailto:${BOOT.contact}`, text: BOOT.contact }), '.')];
-  if (!S.slots.length) return [notice, h('p', { class: 'empty' },
-    'No free times in the coming weeks. Please email ', h('a', { href: `mailto:${BOOT.contact}`, text: BOOT.contact }), '.')];
+  if (S.paused) return [h('p', { class: 'empty', text: `Booking is paused right now. Please contact ${BOOT.owner} directly.` })];
+  if (!S.slots.length) return [notice, h('p', { class: 'empty', text: `No free times in the coming weeks. Please contact ${BOOT.owner} directly.` })];
 
   const first = monthStart(new Date(S.slots[0]));
   const last = monthStart(new Date(S.slots[S.slots.length - 1]));
@@ -409,7 +408,10 @@ function formView() {
 
   const submit = h('button', { class: 'primary', type: 'submit', text: 'Confirm booking' });
   const pending = h('div', { hidden: true }, waiting('Booking your meeting and sending the invites…'));
+  const shownAt = Date.now();
   const form = h('form', { novalidate: true },
+    // Left empty by people; bots that fill in every field are rejected.
+    h('input', { class: 'hp', name: 'website', type: 'text', tabindex: '-1', autocomplete: 'off', 'aria-hidden': 'true' }),
     h('label', {}, 'Your name', h('input', { name: 'name', required: true, autocomplete: 'name', maxlength: 100 })),
     h('label', {}, 'Your email', h('input', { name: 'email', type: 'email', required: true, autocomplete: 'email' })),
     h('label', {}, h('span', {}, 'What would you like to discuss? ', h('span', { class: 'opt', text: '(optional)' })),
@@ -428,6 +430,8 @@ function formView() {
       email: String(fd.get('email') || '').trim(),
       topic: String(fd.get('topic') || ''),
       guests: fd.getAll('guest').map(String).map(s => s.trim()).filter(Boolean),
+      website: String(fd.get('website') || ''),
+      elapsed: Date.now() - shownAt,
     };
     const fail = msg => {
       error.textContent = msg; error.hidden = false; pending.hidden = true;
