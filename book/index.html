@@ -267,7 +267,7 @@ function renderNotFound() {
 
 let T;
 const S = { duration: null, slots: [], byDay: {}, month: null, day: null, slot: null,
-            loading: false, paused: false, notice: '', step: 'pick', result: null };
+            dayChosen: false, loading: false, paused: false, notice: '', step: 'pick', result: null };
 let body, durationBox;
 
 function renderBook() {
@@ -314,7 +314,8 @@ function applySlots(res) {
   S.slots = res.slots || [];
   S.byDay = {};
   S.slots.forEach(ms => (S.byDay[dayKey(new Date(ms))] ||= []).push(ms));
-  if (!S.byDay[S.day]) S.day = S.slots.length ? dayKey(new Date(S.slots[0])) : null;
+  // Show the earliest free day until the visitor picks one.
+  if (!S.dayChosen || !S.byDay[S.day]) S.day = S.slots.length ? dayKey(new Date(S.slots[0])) : null;
   S.month = S.day ? monthStart(new Date(S.byDay[S.day][0])) : null;
   draw();
 }
@@ -352,7 +353,7 @@ function pickView() {
       type: 'button', text: String(d), disabled: !avail,
       class: 'day' + (avail ? ' avail' : '') + (k === S.day ? ' sel' : ''),
       'aria-label': avail ? `${k}, available` : k,
-      onclick: () => { S.day = k; draw(); },
+      onclick: () => { S.day = k; S.dayChosen = true; draw(); },
     }));
   }
 
